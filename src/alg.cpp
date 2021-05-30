@@ -15,7 +15,8 @@ int pr(char ch){
       return 3;
     case '/' :
       return 3;
-    default: return -1;
+    default: 
+      return -1;
   }
 }
 std::string infx2pstfx(std::string inf) {
