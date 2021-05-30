@@ -9,7 +9,7 @@ int pr(char ch){
       return 1;
     case'+':
       return 2;
-    case' -':
+    case'-':
       return 2;
     case'*' :
       return 3;
@@ -105,7 +105,7 @@ int comparison(std::string pst) {
             stackInt.pop();
             int number1 = stackInt.get();
             stackInt.pop();
-            int result = calculating(operate, number1, number2);
+            int result = calcu(operate, number1, number2);
             stackInt.push(result);
         }
         if (i < pst.size())
