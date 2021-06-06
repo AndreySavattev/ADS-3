@@ -1,119 +1,102 @@
 // Copyright 2021 NNTU-CS
 #include<string>
 #include"tstack.h"
-int pr(char ch){
-  switch(ch){
-    case'(':
-      return 0;
-    case')':
-      return 1;
-    case'+':
-      return 2;
-    case'-':
-      return 2;
-    case'*' :
-      return 3;
-    case '/' :
-      return 3;
-    default: 
-      return -1;
-  }
+int priority(char ch) {
+    switch (ch) {
+    case '(': return 0;
+    case ')': return 1;
+    case '+': return 2;
+    case '-': return 2;
+    case '*': return 3;
+    case '/': return 3;
+    default: return -1;
+    }
 }
 std::string infx2pstfx(std::string inf) {
-    std::string pstfx;
-    int i = 0;
-    char ch = inf[i];
     char top = 0;
-    TStack <char> stackChar;
-    while (ch) {
+    TStack <char> stack1;
+    std::string strpst;
+    for (int i = 0; i < inf.length(); i++) {
         int prior;
-        prior = pr(ch);
-      if (prior > -1) {
-            if ((prior == 0 || prior > pr(top) ||
-                stackChar.isEmpty()) && ch != ')') {
-                if (stackChar.isEmpty())
-                    top = ch;
-                stackChar.push(ch);
-            } else if (ch == ')') {
-                while (stackChar.get() != '(') {
-                    pstfx.push_back(stackChar.get());
-                    pstfx.push_back(' ');
-                    stackChar.pop();
+        prior = priority(inf[i]);
+        if (prior > -1) {
+            if ((prior == 0 || prior > priority(top) ||
+                stack1.isEmpty()) && inf[i] != ')') {
+                if (stack1.isEmpty())
+                    top = inf[i];
+                stack1.push(inf[i]);
+            } else if (inf[i] == ')') {
+                while (stack1.get() != '(') {
+                    strpst.push_back(stack1.get());
+                    strpst.push_back(' ');
+                    stack1.pop();
                 }
-                stackChar.pop();
-                if (stackChar.isEmpty())
+                stack1.pop();
+                if (stack1.isEmpty())
                     top = 0;
             } else {
-                while (!stackChar.isEmpty() &&
-                       pr(stackChar.get()) >= prior) {
-                    pstfx.push_back(stackChar.get());
-                    pstfx.push_back(' ');
-                    stackChar.pop();
+                while (!stack1.isEmpty() &&
+                    priority(stack1.get()) >= prior) {
+                    strpst.push_back(stack1.get());
+                    strpst.push_back(' ');
+                    stack1.pop();
                 }
-                if (stackChar.isEmpty())
-                    top = ch;
-                stackChar.push(ch);
+                if (stack1.isEmpty())
+                    top = inf[i];
+                stack1.push(inf[i]);
             }
         } else {
-        pstfx.push_back(ch);
-            pstfx.push_back(' ');
+            strpst.push_back(inf[i]);
+            strpst.push_back(' ');
         }
-        ch = inf[++i];
     }
-    while (!stackChar.isEmpty()) {
-        pstfx.push_back(stackChar.get());
-        pstfx.push_back(' ');
-        stackChar.pop();
+    while (!stack1.isEmpty()) {
+        strpst.push_back(stack1.get());
+        strpst.push_back(' ');
+        stack1.pop();
     }
-  pstfx.erase(pstfx.end() - 1, pstfx.end());
-    return pstfx;
+    strpst.erase(strpst.end() - 1, strpst.end());
+    return strpst;
 }
-int calcu(char operate, int number1, int number2) {
-    switch (operate) {
-case '+':
-        return number1 + number2;
-        break;
-    case '-':
-        return number1 - number2;
-        break;
-    case '*':
-        return number1 * number2;
-        break;
-    case '/':
-        return number1 / number2;
-        break;
+int calculator(int num1, int num2, char operation) {
+    switch (operation) {
+    case '+': return num1 + num2;
+    case '-': return num1 - num2;
+    case'*': return num1 * num2;
+    case '/': return num1 / num2;
     }
 }
-int comparison(std::string pst) {
-    TStack <int> stackInt;
-    int i = 0, result = 0;
+int eval(std::string pst) {
+    TStack <int> stack2;
+    int i = 0;
+    int res = 0;
     char ch = pst[i];
     while (ch) {
- if (ch >= '0' && ch <= '9') {
-            int insertInt = 0;
+        if (ch >= '0' && ch <= '9') {
+            int chpst = 0;
             int dec = 1;
             while (ch != ' ') {
-                insertInt += (ch - 48) * dec;
+                chpst += (ch - 48) * dec;
                 dec *= 10;
                 ch = pst[++i];
             }
-            stackInt.push(insertInt);
+            stack2.push(chpst);
         } else {
-            char operate = ch;
+            char operation = ch;
             i++;
-            int number2 = stackInt.get();
-            stackInt.pop();
-            int number1 = stackInt.get();
-            stackInt.pop();
-            int result = calcu(operate, number1, number2);
-            stackInt.push(result);
+            int num2 = stack2.get();
+            stack2.pop();
+            int num1 = stack2.get();
+            stack2.pop();
+            int res = calculator(num1, num2, operation);
+            stack2.push(res);
         }
         if (i < pst.size())
             ch = pst[++i];
         else
             ch = 0;
     }
-    result = stackInt.get();
-    stackInt.pop();
-    return result;
+    res = stack2.get();
+    stack2.pop();
+    return res;
 }
